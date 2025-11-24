@@ -4,7 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ระบบแจ้งเบาะแสการทุจริตแห่งชาติ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com">// โหลดจังหวัด/อำเภอ/ตำบลจาก Supabase
+(async function(){
+  const supabase = window.supabase.createClient("YOUR_SUPABASE_URL", "YOUR_PUBLIC_ANON_KEY");
+
+  const provinceSelect = document.getElementById('province');
+  const districtSelect = document.getElementById('district');
+  const subdistrictSelect = document.getElementById('subdistrict');
+
+  // โหลดจังหวัด
+  const { data: provinces } = await supabase.from('provinces').select('*');
+  provinceSelect.innerHTML = '<option value="">-- เลือกจังหวัด --</option>' +
+    provinces.map(p => `<option value="${p.id}">${p.name_th}</option>`).join('');(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+  // โหลดอำเภอเมื่อเลือกจังหวัด
+  provinceSelect.addEventListener('change', async () => {
+    districtSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
+    const { data: districts } = await supabase.from('districts').select('*').eq('proince_id', provinceSelect.value);
+
+    districtSelect.innerHTML = '<option value="">-- เลือกอำเภอ --</option>' +
+      districts.map(d => `<option value="${d.id}">${d.name_th}</option>`).join('');(d => `<option value="${d.id}">${d.name}</option>`).join('');
+
+    subdistrictSelect.innerHTML = '<option value="">-- เลือกตำบล --</option>';
+  });
+
+  // โหลดตำบลเมื่อเลือกอำเภอ
+  districtSelect.addEventListener('change', async () => {
+    subdistrictSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
+    const { data: subs } = await supabase.from('tambon').select('*').eq('district_id', districtSelect.value);
+
+    subdistrictSelect.innerHTML = '<option value="">-- เลือกตำบล --</option>' +
+      subs.map(s => `<option value="${s.id}">${s.name_th}</option>`).join('');(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  });
+})();
+
+</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{--bg:#f5f7fa;--primary:#1E3A8A;--accent:#0EA5E9;}
@@ -26,7 +60,7 @@
 </head>
 <body class="min-h-screen text-gray-800">
 
-  <main class="max-w-2xl mx-auto p-4">
+  <main class="w-full max-w-full md:max-w-2xl mx-auto p-4">
 
     <!-- Top header / brand -->
     <header class="mt-3 mb-3 flex items-center gap-3">
@@ -99,10 +133,7 @@
   <div>
     <label class="text-sm text-gray-700">จังหวัด</label>
     <select id="province" name="province" required class="mt-1 block w-full rounded-2xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]">
-      <option value="">-- เลือกจังหวัด --</option>
-      <option>นครนายก</option>
-      <option>ปราจีนบุรี</option>
-      <option>ฉะเชิงเทรา</option>
+      <option value="">กำลังโหลดจังหวัด...</option>
     </select>
   </div>
 
@@ -138,10 +169,12 @@
       <div id="chat-output" class="flex-1 p-3 flex flex-col space-y-2 overflow-y-auto bg-gray-50"></div>
 
       <div class="p-3 border-t bg-white">
-        <div class="flex space-x-2">
-          <input type="text" id="user-input" placeholder="พิมพ์รายละเอียดทุจริต..." class="flex-1 p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500" />
-          <button id="send-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-70 rounded-xl shadow">ส่ง</button>
-        </div>
+  <div class="flex flex-col gap-3">
+    <textarea id="user-input" rows="3" placeholder="พิมพ์รายละเอียดทุจริต..." class="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500"></textarea>
+    <button id="analyzeBtn" type="button" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-lg shadow">วิเคราะห์</button>
+    <button id="reportCorruptionBtn" type="button" class="w-full py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-lg shadow">แจ้งการทุจริต</button>
+  </div>
+</div>
       </div>
     </div>
   </div>
@@ -153,13 +186,7 @@
           </div>
         </div>
 
-        <div class="space-y-2">
-          <button id="analyzeBtn" type="submit" class="w-full py-3 rounded-2xl bg-[#1E3A8A] hover:bg-red-700 
-            text-white font-extrabold text-lg shadow">วิเคราะห์</button>
-          <button id="reportCorruptionBtn" type="submit" class="w-full py-3 rounded-2xl bg-[#1E3A8A] hover:bg-red-700 
-            text-white font-extrabold text-lg shadow">แจ้งการทุจริต</button>
-          
-        </div>
+        
 
       </form>
 
