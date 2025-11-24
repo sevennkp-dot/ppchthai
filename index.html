@@ -4,42 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ระบบแจ้งเบาะแสการทุจริตแห่งชาติ</title>
-  <script src="https://cdn.tailwindcss.com">// โหลดจังหวัด/อำเภอ/ตำบลจาก Supabase
-(async function(){
-  const supabase = window.supabase.createClient("YOUR_SUPABASE_URL", "YOUR_PUBLIC_ANON_KEY");
-
-  const provinceSelect = document.getElementById('province');
-  const districtSelect = document.getElementById('district');
-  const subdistrictSelect = document.getElementById('subdistrict');
-
-  // โหลดจังหวัด
-  const { data: provinces } = await supabase.from('provinces').select('*');
-  provinceSelect.innerHTML = '<option value="">-- เลือกจังหวัด --</option>' +
-    provinces.map(p => `<option value="${p.id}">${p.name_th}</option>`).join('');(p => `<option value="${p.id}">${p.name}</option>`).join('');
-
-  // โหลดอำเภอเมื่อเลือกจังหวัด
-  provinceSelect.addEventListener('change', async () => {
-    districtSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
-    const { data: districts } = await supabase.from('districts').select('*').eq('proince_id', provinceSelect.value);
-
-    districtSelect.innerHTML = '<option value="">-- เลือกอำเภอ --</option>' +
-      districts.map(d => `<option value="${d.id}">${d.name_th}</option>`).join('');(d => `<option value="${d.id}">${d.name}</option>`).join('');
-
-    subdistrictSelect.innerHTML = '<option value="">-- เลือกตำบล --</option>';
-  });
-
-  // โหลดตำบลเมื่อเลือกอำเภอ
-  districtSelect.addEventListener('change', async () => {
-    subdistrictSelect.innerHTML = '<option value="">กำลังโหลด...</option>';
-    const { data: subs } = await supabase.from('tambon').select('*').eq('district_id', districtSelect.value);
-
-    subdistrictSelect.innerHTML = '<option value="">-- เลือกตำบล --</option>' +
-      subs.map(s => `<option value="${s.id}">${s.name_th}</option>`).join('');(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  });
-})();
-
-</script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root{--bg:#f5f7fa;--primary:#1E3A8A;--accent:#0EA5E9;}
     html,body{height:100%;}
@@ -127,31 +94,15 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700">สถานที่เกิดการทุจริต <span class="text-red-600">*</span></label>
+<textarea id="locationText" name="location" required class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="ระบุสถานที่เกิดเหตุ..."></textarea>
 
-<div class="grid grid-cols-1 gap-3 mt-1">
-  <!-- จังหวัด -->
-  <div>
-    <label class="text-sm text-gray-700">จังหวัด</label>
-    <select id="province" name="province" required class="mt-1 block w-full rounded-2xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]">
-      <option value="">กำลังโหลดจังหวัด...</option>
-    </select>
-  </div>
+
 
   <!-- อำเภอ -->
-  <div>
-    <label class="text-sm text-gray-700">อำเภอ</label>
-    <select id="district" name="district" required class="mt-1 block w-full rounded-2xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]">
-      <option value="">-- เลือกอำเภอ --</option>
-    </select>
-  </div>
+  
 
   <!-- ตำบล -->
-  <div>
-    <label class="text-sm text-gray-700">ตำบล</label>
-    <select id="subdistrict" name="subdistrict" required class="mt-1 block w-full rounded-2xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#1E3A8A]">
-      <option value="">-- เลือกตำบล --</option>
-    </select>
-  </div>
+  
 </div>
 
         <!-- OpenAI Chatbot UI integrated -->
@@ -160,7 +111,7 @@
 
   <div id="aiChatContainer" class="mt-3 w-full rounded-2xl border shadow-md overflow-hidden">
     <!-- Chatbot HTML from index.txt -->
-    <div class="w-full bg-white rounded-xl overflow-hidden flex flex-col h-[320px]">
+    <div class="w-full bg-white rounded-xl overflow-hidden flex flex-col h-[520px]">
       <header class="p-3 bg-indigo-600 text-white shadow-md">
         <h1 class="text-base font-bold">🛠️ ผู้ช่วยวิเคราะห์ข้อมูลทุจริต (AI)</h1>
         <p class="text-xs opacity-90">กรุณาพิมพ์รายละเอียดที่ต้องการให้ระบบวิเคราะห์</p>
@@ -314,3 +265,124 @@
 })();
 
 </script>
+<script>
+// --- AI วิเคราะห์ความรับผิดชอบ ป.ป.ช + ควบคุมปุ่มแจ้งการทุจริต ---
+let aiChecked = false;
+let aiIsNACC = false;
+
+async function analyzeCorruptionDetails() {
+  const input = document.getElementById('user-input').value.trim();
+  const outputBox = document.getElementById('chat-output');
+  const reportBtn = document.getElementById('reportCorruptionBtn');
+
+  aiChecked = false;
+  aiIsNACC = false;
+  reportBtn.disabled = true;
+  reportBtn.classList.add('opacity-50');
+
+  if (!input) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'p-2 bg-gray-200 rounded-xl self-end';
+  userMsg.textContent = input;
+  outputBox.appendChild(userMsg);
+
+  const res = await fetch('/api/check-nacc-responsibility', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: input })
+  });
+
+  const data = await res.json();
+  aiChecked = true;
+  aiIsNACC = data.is_nacc_responsibility === true;
+
+  const botMsg = document.createElement('div');
+  botMsg.className = 'p-2 rounded-xl';
+  botMsg.textContent = data.message || (aiIsNACC ? 'เป็นอำนาจหน้าที่ของ ป.ป.ช' : 'ไม่อยู่ในความรับผิดชอบของ ป.ป.ช');
+  botMsg.classList.add(aiIsNACC ? 'bg-green-200' : 'bg-red-200');
+  outputBox.appendChild(botMsg);
+
+  if (aiIsNACC) {
+    reportBtn.disabled = false;
+    reportBtn.classList.remove('opacity-50');
+  }
+}
+
+document.getElementById('analyzeBtn').addEventListener('click', analyzeCorruptionDetails);
+
+// --- Location AI ---
+
+async function analyzeLocationWithAI() {
+  const text = document.getElementById('locationText').value.trim();
+  if (!text) return;
+
+  // 🔥 ส่งข้อความให้ API ฝั่งเซิร์ฟเวอร์ของคุณ (ให้ backend เรียก AI อีกที)
+  const res = await fetch('/api/extract-location', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text })
+  });
+
+  const data = await res.json();
+
+  document.getElementById('provinceField').value = data.province || '';
+  document.getElementById('districtField').value = data.district || '';
+  document.getElementById('subdistrictField').value = data.subdistrict || '';
+  document.getElementById('villageField').value = data.village || '';
+}
+
+document.getElementById('locationText').addEventListener('blur', analyzeLocationWithAI);
+</script>
+
+<!-- hidden AI results -->
+<input id="villageField" name="village_ai" type="hidden" />
+<input id="provinceField" name="province_ai" type="hidden" />
+<input id="districtField" name="district_ai" type="hidden" />
+<input id="subdistrictField" name="subdistrict_ai" type="hidden" />
+
+<!-- Popup ผลการวิเคราะห์ AI -->
+<div id="aiResultPopup" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+    <h3 class="text-lg font-bold mb-2">ผลการวิเคราะห์จากระบบ AI</h3>
+    <p id="aiResultText" class="text-gray-700 mb-4"></p>
+    <button id="closeAiPopup" class="px-4 py-2 rounded-xl bg-indigo-600 text-white">ปิด</button>
+  </div>
+</div>
+
+<script>
+// --- Popup แสดงผล AI ---
+function showAiPopup(message){
+  document.getElementById('aiResultText').innerHTML = message;
+  document.getElementById('aiResultPopup').classList.remove('hidden');
+}
+
+document.getElementById('closeAiPopup').addEventListener('click', ()=>{
+  document.getElementById('aiResultPopup').classList.add('hidden');
+});
+
+// แทรก popup เข้า logic วิเคราะห์ AI เดิม
+const originalAnalyze = analyzeCorruptionDetails;
+analyzeCorruptionDetails = async function(){
+  await originalAnalyze();
+  if(aiChecked){
+    const village = document.getElementById('villageField').value;
+    const subdistrict = document.getElementById('subdistrictField').value;
+    const district = document.getElementById('districtField').value;
+    const province = document.getElementById('provinceField').value;
+
+    const locationText = aiIsNACC
+      ? `<span class='text-green-700 font-bold text-lg'>✔ เป็นความรับผิดชอบของสำนักงาน ป.ป.ช</span><br>
+         <span class='text-gray-800'>พื้นที่ตรวจสอบ:</span><br>
+         <span class='text-gray-700'>หมู่บ้าน: <b>${village || '-'}</b></span><br>
+         <span class='text-gray-700'>ตำบล: <b>${subdistrict || '-'}</b></span><br>
+         <span class='text-gray-700'>อำเภอ: <b>${district || '-'}</b></span><br>
+         <span class='text-gray-700'>จังหวัด: <b>${province || '-'}</b></span>`
+      : `<span class='text-red-700 font-bold text-lg'>✖ ไม่อยู่ในความรับผิดชอบของสำนักงาน ป.ป.ช</span>`;
+    showAiPopup(locationText);
+  }
+};
+</script>
+
+</body>
+</html>
