@@ -46,7 +46,7 @@
       <div class="mb-4">
 
         
-        <h2 class="text-lg font-bold">แจ้งการทุจริต</h2>
+        <h2 class="text-lg font-bold">แจ้งการทุจริติ</h2>
         <p class="text-sm text-gray-600 mt-1">กรุณากรอกข้อมูลที่เป็นความจริงเพื่อให้สำนักงานตรวจสอบ</p>
       </div>
 
@@ -287,9 +287,14 @@ async function analyzeCorruptionDetails() {
   userMsg.textContent = input;
   outputBox.appendChild(userMsg);
 
-  const res = await fetch('/api/check-nacc-responsibility', {
+  const res = await fetch('https://ylbklwrgbgmlrvknmmbn.supabase.co/functions/v1/check-nacc-responsibility', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      // ใช้ anon key ของ Supabase เพื่อเรียก Edge Function (ปลอดภัยกว่าการเรียก OpenAI จาก frontend)
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg'
+    },
     body: JSON.stringify({ text: input })
   });
 
@@ -318,9 +323,13 @@ async function analyzeLocationWithAI() {
   if (!text) return;
 
   // 🔥 ส่งข้อความให้ API ฝั่งเซิร์ฟเวอร์ของคุณ (ให้ backend เรียก AI อีกที)
-  const res = await fetch('/api/extract-location', {
+  const res = await fetch('https://ylbklwrgbgmlrvknmmbn.supabase.co/functions/v1/extract-location', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg',
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg'
+    },
     body: JSON.stringify({ text })
   });
 
