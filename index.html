@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="th">
 <head>
+<script>
+  window.OPENAI_KEY = "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";
+</script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ระบบแจ้งเบาะแสการทุจริตแห่งชาติ</title>
@@ -287,24 +290,31 @@ async function analyzeCorruptionDetails() {
   userMsg.textContent = input;
   outputBox.appendChild(userMsg);
 
-  const res = await fetch('https://ylbklwrgbgmlrvknmmbn.supabase.co/functions/v1/check-nacc-responsibility', {
+  // 🔥 เรียก OpenAI โดยตรง (ต้องใส่ API KEY)
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      // ใช้ anon key ของ Supabase เพื่อเรียก Edge Function (ปลอดภัยกว่าการเรียก OpenAI จาก frontend)
-      'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg',
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlsYmtsd3JnYmdtbHJ2a25tbWJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MzYzMjEsImV4cCI6MjA3OTQxMjMyMX0.QWpte6kTozqYipYysFd2d6ewNXVqjmDMz18z98NAOqg'
+      'Authorization': `Bearer ${window.OPENAI_KEY}`
     },
-    body: JSON.stringify({ text: input })
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'วิเคราะห์ว่าข้อความนี้เป็นอำนาจหน้าที่ของ ป.ป.ช หรือไม่ ตอบเป็น JSON เช่น {"is_nacc_responsibility": true, "message": "..."}' },
+        { role: 'user', content: input }
+      ]
+    })
   });
 
   const data = await res.json();
+  const ai = JSON.parse(data.choices[0].message.content);
+
   aiChecked = true;
-  aiIsNACC = data.is_nacc_responsibility === true;
+  aiIsNACC = ai.is_nacc_responsibility === true;
 
   const botMsg = document.createElement('div');
   botMsg.className = 'p-2 rounded-xl';
-  botMsg.textContent = data.message || (aiIsNACC ? 'เป็นอำนาจหน้าที่ของ ป.ป.ช' : 'ไม่อยู่ในความรับผิดชอบของ ป.ป.ช');
+  botMsg.textContent = ai.message;
   botMsg.classList.add(aiIsNACC ? 'bg-green-200' : 'bg-red-200');
   outputBox.appendChild(botMsg);
 
@@ -314,7 +324,7 @@ async function analyzeCorruptionDetails() {
   }
 }
 
-document.getElementById('analyzeBtn').addEventListener('click', analyzeCorruptionDetails);
+document.getElementById('analyzeBtn').addEventListener('click', analyzeCorruptionDetails);('click', analyzeCorruptionDetails);
 
 // --- Location AI ---
 
