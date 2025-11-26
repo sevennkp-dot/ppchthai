@@ -1,16 +1,30 @@
 import OpenAI from "openai";
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+export const config = {
+  runtime: "edge",
+};
 
+export default async function handler(req) {
   try {
-    const { model, messages } = req.body;
-    const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const body = await req.json();
 
-    const result = await client.chat.completions.create({ model, messages });
-    res.status(200).json(result);
+    const client = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
 
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+    const completion = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: body.messages
+    });
+
+    return new Response(JSON.stringify(completion), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
+    });
   }
 }
