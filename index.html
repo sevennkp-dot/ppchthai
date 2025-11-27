@@ -1,7 +1,6 @@
 <!doctype html>
 <html lang="th">
 <head>
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ระบบแจ้งเบาะแสการทุจริตแห่งชาติ</title>
@@ -15,16 +14,14 @@
     .loading{display:inline-block;width:18px;height:18px;border:3px solid #f3f3f3;border-top:3px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite}
     @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    /* toast */
     .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(-10px);top:18px;z-index:60;padding:10px 16px;border-radius:10px;color:white;font-weight:600;opacity:0;transition:all .28s ease;backdrop-filter: blur(4px)}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    /* highlight animation for new items */
     .pulse-highlight{animation:pulse 2s ease-in-out; border-color:#fde68a}
     @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(253,230,138,0.0)}50%{box-shadow:0 6px 18px -6px rgba(253,230,138,0.6)}100%{box-shadow:0 0 0 0 rgba(253,230,138,0.0)}}
     * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
-  body { display: flex; flex-direction: column; min-height: 100vh; }
-</style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+  </style>
 </head>
 <body class="min-h-screen text-gray-800">
 
@@ -33,7 +30,7 @@
     <!-- Top header / brand -->
     <header class="mt-3 mb-3 flex items-center gap-3">
       <div class="w-12 h-12 rounded-3xl bg-[000000] flex items-center justify-center shadow-md">
-        <img src="https://yoauscrafbucdahwlvmc.supabase.co/storage/v1/object/sign/pic/logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82YzU0ZjkzMi04YzdhLTQ2OGQtOTI3OC0wZGMyNjBlNGRlYWYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJwaWMvbG9nby5wbmciLCJpYXQiOjE3NjM3MjQ0MDQsImV4cCI6NDkxNzMyNDQwNH0.RZSux7PsSQe2ekfKxmJrQ-PhxmvQ-2QGiEJCt465GRQ" class="w-24 h-24 object-contain" />
+        <img src="https://yoauscrafbucdahwlvmc.supabase.co/storage/v1/object/sign/pic/logo.png" class="w-24 h-24 object-contain" alt="logo"/>
       </div>
       <div>
         <h1 class="text-xl font-extrabold">สำนักงาน ป.ป.ช</h1>
@@ -43,16 +40,24 @@
 
     <!-- Primary card: emergency form -->
     <section id="reportCard" class="bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 mb-5">
-    
       <div class="mb-4">
-
-        
         <h2 class="text-lg font-bold">แจ้งการทุจริติ</h2>
         <p class="text-sm text-gray-600 mt-1">กรุณากรอกข้อมูลที่เป็นความจริงเพื่อให้สำนักงานตรวจสอบ</p>
       </div>
 
-       <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm">
-  <span class="block text-sm font-semibold text-gray-800">ระบุตัวตนหรือไม่ <span class="text-red-600">*</span></span> <span class="text-red-600">*</span></span>
+      <div class="p-4 rounded-2xl bg-gray-50 border border-gray-200 shadow-sm">
+
+  <!-- Case ID Display moved to top -->
+  <div class="p-4 mb-4 bg-blue-50 border border-blue-300 rounded-2xl shadow-sm">
+    <label class="block text-sm font-semibold text-blue-900">รหัสเรื่อง</label>
+    <div class="flex items-center gap-2 mt-2">
+      <input id="caseIdDisplay" type="text" readonly class="flex-1 rounded-xl border px-4 py-2 bg-white font-semibold text-blue-700 shadow-sm" />
+      <button type="button" id="copyCaseIdBtn" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold">คัดลอก</button>
+    </div>
+    <input type="hidden" id="caseIdInput" name="case_id" />
+  </div>
+
+  <span class="block text-sm font-semibold text-gray-800">ระบุตัวตนหรือไม่ <span class="text-red-600">*</span></span>
   <div class="mt-2 flex flex-col gap-2">
     <label class="inline-flex items-center gap-2">
       <input type="radio" name="identify" value="yes" class="w-4 h-4" required>
@@ -64,21 +69,14 @@
     </label>
   </div>
 
-  <!-- Case ID Display (better styled) -->
-  <div class="mt-4 p-4 bg-blue-50 border border-blue-300 rounded-2xl shadow-sm">
-    <label class="block text-sm font-semibold text-blue-900">รหัสเรื่อง</label>
-    <div class="flex items-center gap-2 mt-2">
-      <input id="caseIdDisplay" type="text" readonly class="flex-1 rounded-xl border px-4 py-2 bg-white font-semibold text-blue-700 shadow-sm" />
-      <button type="button" id="copyCaseIdBtn" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold">คัดลอก</button>
-    </div>
-    <input type="hidden" id="caseIdInput" name="case_id" />
-  </div>
-</div>
-</div>
 </div>
 
-      
-      <form id="emergencyForm" class="space-y-4" novalidate>
+        
+          <input type="hidden" id="caseIdInput" name="case_id" />
+        </div>
+      </div>
+
+      <form id="emergencyForm" class="space-y-4 hidden" novalidate id="formContainer">
 
         <div>
           <label for="inputName" class="block text-sm font-medium text-gray-700">ชื่อ-นามสกุล <span class="text-red-600">*</span></label>
@@ -91,311 +89,308 @@
           <p class="text-red-600 text-sm mt-1 font-bold">** โปรดกรอกเบอร์โทรให้ถูกต้อง เพื่อให้เจ้าหน้าที่สามารถติดต่อกลับได้ **</p>
         </div>
 
-        
-
         <div>
-          <label class="block text-sm font-medium text-gray-700">สถานที่เกิดการทุจริต <span class="text-red-600">*</span></label>
-<textarea id="locationText" name="location" required class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="ระบุสถานที่เกิดเหตุ..."></textarea>
-
-
-
-  <!-- อำเภอ -->
-  
-
-  <!-- ตำบล -->
-  
-</div>
-
-        <!-- OpenAI Chatbot UI integrated -->
-<div>
-  <label class="block text-sm font-medium text-gray-700">รายละเอียดการทุจริต (ระบบ AI วิเคราะห์)<span class="text-red-600">*</span></label>
-
-  <div id="aiChatContainer" class="mt-3 w-full rounded-2xl border shadow-md overflow-hidden">
-    <!-- Chatbot HTML from index.txt -->
-    <div class="w-full bg-white rounded-xl overflow-hidden flex flex-col h-[520px]">
-      <header class="p-3 bg-indigo-600 text-white shadow-md">
-        <h1 class="text-base font-bold">🛠️ ผู้ช่วยวิเคราะห์ข้อมูลทุจริต (AI)</h1>
-        <p class="text-xs opacity-90">กรุณาพิมพ์รายละเอียดที่ต้องการให้ระบบวิเคราะห์</p>
-      </header>
-
-      <div id="chat-output" class="flex-1 p-3 flex flex-col space-y-2 overflow-y-auto bg-gray-50"></div>
-
-      <div class="p-3 border-t bg-white">
-  <div class="flex flex-col gap-3">
-    <textarea id="user-input" rows="3" placeholder="พิมพ์รายละเอียดทุจริต..." class="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500"></textarea>
-    <button id="analyzeBtn" type="button" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-lg shadow">วิเคราะห์</button>
-    <button id="reportCorruptionBtn" type="button" class="w-full py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-lg shadow">แจ้งการทุจริต</button>
-  </div>
-</div>
-      </div>
+  <label class="block text-sm font-medium text-gray-700">สถานที่เกิดการทุจริต <span class="text-red-600">*</span></label>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-2">
+    <div>
+      <label class="text-sm">หมู่บ้าน</label>
+      <input id="villageInput" name="village" type="text" class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="หมู่บ้าน">
+    </div>
+    <div>
+      <label class="text-sm">ตำบล</label>
+      <input id="subdistrictInput" name="subdistrict" type="text" class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="ตำบล">
+    </div>
+    <div>
+      <label class="text-sm">อำเภอ</label>
+      <input id="districtInput" name="district" type="text" class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="อำเภอ">
+    </div>
+    <div>
+      <label class="text-sm">จังหวัด</label>
+      <input id="provinceInput" name="province" type="text" class="mt-1 block w-full rounded-2xl border px-4 py-3" placeholder="จังหวัด">
     </div>
   </div>
 </div>
 
-          <div id="locationInfo" class="mt-2 hidden text-sm text-gray-700 bg-green-50 border border-green-100 rounded-xl p-3">
-            <div id="coordinates" class="font-medium"></div>
-            <div id="geoText" class="text-xs text-gray-600 mt-1"></div>
+        <!-- OpenAI Chatbot UI integrated -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700">รายละเอียดการทุจริต (ระบบ AI วิเคราะห์)<span class="text-red-600">*</span></label>
+
+          <div id="aiChatContainer" class="mt-3 w-full rounded-2xl border shadow-md overflow-hidden">
+            <div class="w-full bg-white rounded-xl overflow-hidden flex flex-col h-[520px]">
+              <header class="p-3 bg-indigo-600 text-white shadow-md">
+                <h1 class="text-base font-bold">🛠️ ผู้ช่วยวิเคราะห์ข้อมูลทุจริต (AI)</h1>
+                <p class="text-xs opacity-90">กรุณาพิมพ์รายละเอียดที่ต้องการให้ระบบวิเคราะห์</p>
+              </header>
+
+              <div id="chat-output" class="flex-1 p-3 flex flex-col space-y-2 overflow-y-auto bg-gray-50"></div>
+
+              <div class="p-3 border-t bg-white">
+                <div class="flex flex-col gap-3">
+                  <textarea id="user-input" rows="3" placeholder="พิมพ์รายละเอียดทุจริต..." class="w-full p-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500"></textarea>
+                  <button id="analyzeBtn" type="button" class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-lg shadow">วิเคราะห์</button>
+                  <button id="reportCorruptionBtn" type="button" class="w-full py-3 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-extrabold text-lg shadow hidden opacity-50" disabled>แจ้งการทุจริต</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        
-
-      </form>
-
-    </section>
-
-    <!-- Tracking (hidden by default) -->
-    <section id="userTrackingPage" class="hidden bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 mb-5">
-      <div class="mb-3"><h3 class="font-bold">ตรวจสอบความคืบหน้า</h3><p class="text-sm text-gray-600">กรอกเบอร์โทรที่ใช้แจ้งเหตุ</p></div>
-      <div class="space-y-3">
-        <input id="trackPhone" type="tel" class="w-full rounded-2xl border px-4 py-3" placeholder="08x-xxx-xxxx">
-        <button id="trackBtn" class="w-full py-3 rounded-2xl bg-[#0EA5E9] hover:bg-blue-800 text-white font-semibold">ค้นหา</button>
-        <div id="trackResults" class="space-y-3"></div>
-        <button id="backToReportBtn" class="text-sm text-gray-600 underline">← กลับ</button>
-      </div>
-    </section>
-
-    <!-- Admin (login + dashboard) -->
-    <section id="loginPage" class="hidden bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 mb-5">
-      <h3 class="font-bold mb-3">เข้าสู่ระบบผู้ดูแล</h3>
-      <form id="loginForm" class="space-y-3">
-        <input name="email" type="email" placeholder="อีเมล" class="w-full rounded-2xl border px-4 py-3" required>
-        <input name="password" type="password" placeholder="รหัสผ่าน" class="w-full rounded-2xl border px-4 py-3" required>
-        <button class="w-full py-3 rounded-2xl bg-gray-800 text-white font-semibold">เข้าสู่ระบบ</button>
-      </form>
-    </section>
-
-    <section id="adminDashboard" class="hidden">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-bold">แดชบอร์ด — รายการแจ้งเบาะแส</h3>
-        <div class="flex gap-2 ml-auto">
-  
-  <button id="downloadReports" class="px-3 py-2 rounded-xl bg-blue-600 text-white">ดาวน์โหลดข้อมูล</button>
-          
-          
-          <button id="logoutBtn" class="px-3 py-2 rounded-xl bg-gray-700 text-white">ออกจากระบบ</button>
+        <div id="locationInfo" class="mt-2 hidden text-sm text-gray-700 bg-green-50 border border-green-100 rounded-xl p-3">
+          <div id="coordinates" class="font-medium"></div>
+          <div id="geoText" class="text-xs text-gray-600 mt-1"></div>
         </div>
-      </div>
 
-      <div id="reportsList" class="space-y-3"></div>
+      </form>
+
     </section>
+
+    <!-- hidden AI results inputs -->
+    <input id="villageField" name="village_ai" type="hidden" />
+    <input id="provinceField" name="province_ai" type="hidden" />
+    <input id="districtField" name="district_ai" type="hidden" />
+    <input id="subdistrictField" name="subdistrict_ai" type="hidden" />
+
+    <!-- Popup ผลการวิเคราะห์ AI -->
+    <div id="aiResultPopup" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+  <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-[0_10px_30px_rgba(0,0,0,0.15)] text-center border border-gray-200 animate-fadeIn">
+    <h3 class="text-xl font-extrabold mb-3 text-indigo-700">ผลการวิเคราะห์จากระบบ AI</h3>
+    <p id="aiResultText" class="text-gray-800 leading-relaxed mb-6"></p>
+    <button id="closeAiPopup" class="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-md transition-all">ปิด</button>
+  </div>
+</div>
+<style>
+@keyframes fadeIn { from { opacity:0; transform:scale(.9);} to {opacity:1; transform:scale(1);} }
+.animate-fadeIn { animation: fadeIn .25s ease-out; }
+</style>
+    </div>
 
   </main>
 
   <div id="modalRoot"></div>
-
-<!-- Download Date Range Modal -->
-<div id="downloadModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl p-5 max-w-md w-full shadow-2xl">
-    <h3 class="text-lg font-bold mb-3">เลือกช่วงวันที่ในการดาวน์โหลด</h3>
-    <div class="space-y-3">
-      <div>
-        <label class="text-sm font-semibold">วันที่เริ่มต้น</label>
-        <input type="date" id="downloadStart" class="mt-1 w-full rounded-xl border px-3 py-2" />
-      </div>
-      <div>
-        <label class="text-sm font-semibold">วันที่สิ้นสุด</label>
-        <input type="date" id="downloadEnd" class="mt-1 w-full rounded-xl border px-3 py-2" />
-      </div>
-    </div>
-    <div class="flex justify-end gap-2 mt-4">
-      <button id="closeDownloadModal" class="px-3 py-2 rounded-xl bg-gray-200">ยกเลิก</button>
-      <button id="confirmDownload" class="px-3 py-2 rounded-xl bg-blue-600 text-white">ดาวน์โหลด</button>
-    </div>
-  </div>
-</div>
   <div id="toast" class="toast bg-black/80 rounded-xl"></div>
+
 <script>
-// สร้างรหัสเรื่องโดยอัตโนมัติ และไม่อนุญาตให้แก้ไข
-(function(){
-  function generateCaseId(){
-    // รูปแบบ: CASE-<time36>-<RND4> เช่น CASE-K5X9Z-7A9B
-    const timePart = Date.now().toString(36).toUpperCase();
-    const rnd = Math.random().toString(36).substring(2,8).toUpperCase();
-    return 'CASE-' + timePart.slice(-6) + '-' + rnd.slice(0,4);
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    const display = document.getElementById('caseIdDisplay');
-    const input = document.getElementById('caseIdInput');
-    if(display && input){
-      const id = generateCaseId();
-      display.value = id;
-      input.value = id;
-      display.setAttribute('readonly','readonly');
-    }
-
-    const form = document.getElementById('emergencyForm');
-    if(form){
-      form.addEventListener('submit', function(e){
-        const current = document.getElementById('caseIdInput');
-        if(!current.value){
-          current.value = generateCaseId();
-        }
-      });
-    }
-  });
-})();
-// แสดง/ซ่อน ชื่อ และ เบอร์โทร ตามการเลือกระบุตัวตน
-(function(){
-  document.addEventListener('DOMContentLoaded', function(){
-    const radioYes = document.querySelector('input[name="identify"][value="yes"]');
-    const radioNo  = document.querySelector('input[name="identify"][value="no"]');
-    const nameField = document.getElementById('inputName').closest('div');
-    const phoneField = document.getElementById('inputPhone').closest('div');
-
-    function updateVisibility(){
-      if(radioNo.checked){
-        nameField.classList.add('hidden');
-        phoneField.classList.add('hidden');
-        document.getElementById('inputName').required = false;
-        document.getElementById('inputPhone').required = false;
-      } else {
-        nameField.classList.remove('hidden');
-        phoneField.classList.remove('hidden');
-        document.getElementById('inputName').required = true;
-        document.getElementById('inputPhone').required = true;
-      }
-    }
-
-    if(radioYes && radioNo){
-      radioYes.addEventListener('change', updateVisibility);
-      radioNo.addEventListener('change', updateVisibility);
-    }
-  });
-})();
-
-</script>
-<script>
-// --- AI วิเคราะห์ความรับผิดชอบ ป.ป.ช + ควบคุมปุ่มแจ้งการทุจริต ---
-let aiChecked = false;
-let aiIsNACC = false;
-
-async function analyzeCorruptionDetails() {
-  const input = document.getElementById('user-input').value.trim();
-  const outputBox = document.getElementById('chat-output');
-  const reportBtn = document.getElementById('reportCorruptionBtn');
-
-  aiChecked = false;
-  aiIsNACC = false;
-  reportBtn.disabled = true;
-  reportBtn.classList.add('opacity-50');
-
-  if (!input) return;
-
-  const userMsg = document.createElement('div');
-  userMsg.className = 'p-2 bg-gray-200 rounded-xl self-end';
-  userMsg.textContent = input;
-  outputBox.appendChild(userMsg);
-
-  // 🔥 เรียก OpenAI โดยตรง (ต้องใส่ API KEY)
-  const res = await fetch('/api/analyze', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: 'วิเคราะห์ว่าข้อความนี้เป็นอำนาจหน้าที่ของ ป.ป.ช หรือไม่ ตอบเป็น JSON เช่น {"is_nacc_responsibility": true, "message": "..."}' },
-        { role: 'user', content: input }
-      ]
-    })
-  });
-
-  const data = await res.json();
-  const ai = JSON.parse(data.choices[0].message.content);
-
-  aiChecked = true;
-  aiIsNACC = ai.is_nacc_responsibility === true;
-
-  const botMsg = document.createElement('div');
-  botMsg.className = 'p-2 rounded-xl';
-  botMsg.textContent = ai.message;
-  botMsg.classList.add(aiIsNACC ? 'bg-green-200' : 'bg-red-200');
-  outputBox.appendChild(botMsg);
-
-  if (aiIsNACC) {
-    reportBtn.disabled = false;
-    reportBtn.classList.remove('opacity-50');
-  }
+// -------------------------
+// Helper UI & init
+// -------------------------
+function generateCaseId(){
+  const timePart = Date.now().toString(36).toUpperCase();
+  const rnd = Math.random().toString(36).substring(2,8).toUpperCase();
+  return 'CASE-' + timePart.slice(-6) + '-' + rnd.slice(0,4);
 }
 
-document.getElementById('analyzeBtn').addEventListener('click', analyzeCorruptionDetails);
-
-// --- Location AI ---
-
-async function analyzeLocationWithAI() {
-  const text = document.getElementById('locationText').value.trim();
-  if (!text) return;
-
-  // 🔥 ส่งข้อความให้ API ฝั่งเซิร์ฟเวอร์ของคุณ (ให้ backend เรียก AI อีกที)
-  const res = await fetch('/api/extract-location', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ text })
-  });
-
-  const data = await res.json();
-
-  document.getElementById('provinceField').value = data.province || (data.raw && '') || '';
-  document.getElementById('districtField').value = data.district || (data.raw && '') || '';
-  document.getElementById('subdistrictField').value = data.subdistrict || (data.raw && '') || '';
-  document.getElementById('villageField').value = data.village || (data.raw && '') || '';
+function showToast(msg, ms = 3000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), ms);
 }
 
-document.getElementById('locationText').addEventListener('blur', analyzeLocationWithAI);
-</script>
-
-<!-- hidden AI results -->
-<input id="villageField" name="village_ai" type="hidden" />
-<input id="provinceField" name="province_ai" type="hidden" />
-<input id="districtField" name="district_ai" type="hidden" />
-<input id="subdistrictField" name="subdistrict_ai" type="hidden" />
-
-<!-- Popup ผลการวิเคราะห์ AI -->
-<div id="aiResultPopup" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50">
-  <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
-    <h3 class="text-lg font-bold mb-2">ผลการวิเคราะห์จากระบบ AI</h3>
-    <p id="aiResultText" class="text-gray-700 mb-4"></p>
-    <button id="closeAiPopup" class="px-4 py-2 rounded-xl bg-indigo-600 text-white">ปิด</button>
-  </div>
-</div>
-
-<script>
-// --- Popup แสดงผล AI ---
 function showAiPopup(message){
   document.getElementById('aiResultText').innerHTML = message;
   document.getElementById('aiResultPopup').classList.remove('hidden');
 }
 
-document.getElementById('closeAiPopup').addEventListener('click', ()=>{
-  document.getElementById('aiResultPopup').classList.add('hidden');
+// -------------------------
+// DOM Ready init
+// -------------------------
+document.addEventListener('DOMContentLoaded', function(){
+  // Case ID
+  const display = document.getElementById('caseIdDisplay');
+  const input = document.getElementById('caseIdInput');
+  if(display && input){
+    const id = generateCaseId();
+    display.value = id;
+    input.value = id;
+    display.setAttribute('readonly','readonly');
+  }
+
+  // Copy case id
+  const copyBtn = document.getElementById('copyCaseIdBtn');
+  if(copyBtn){
+    copyBtn.addEventListener('click', ()=>{
+      navigator.clipboard?.writeText(document.getElementById('caseIdDisplay').value);
+      showToast('คัดลอกรหัสเรื่องแล้ว');
+    });
+  }
+
+  // Show/hide name & phone
+  const radioYes = document.querySelector('input[name="identify"][value="yes"]');
+  const radioNo  = document.querySelector('input[name="identify"][value="no"]');
+  const nameField = document.getElementById('inputName').closest('div');
+  const phoneField = document.getElementById('inputPhone').closest('div');
+
+  function updateVisibility(){
+    if(radioNo.checked){
+      nameField.classList.add('hidden');
+      phoneField.classList.add('hidden');
+      document.getElementById('inputName').required = false;
+      document.getElementById('inputPhone').required = false;
+    } else {
+      nameField.classList.remove('hidden');
+      phoneField.classList.remove('hidden');
+      document.getElementById('inputName').required = true;
+      document.getElementById('inputPhone').required = true;
+    }
+  }
+
+  if(radioYes && radioNo){
+    radioYes.addEventListener('change', updateVisibility);
+    radioNo.addEventListener('change', updateVisibility);
+    // init
+    // init
+    const formContainer = document.getElementById('emergencyForm');
+    formContainer.classList.add('hidden');
+    function toggleForm(){ formContainer.classList.remove('hidden'); }
+    radioYes.addEventListener('change', toggleForm);
+    radioNo.addEventListener('change', toggleForm);
+    updateVisibility();
+  }
+
+  // Close popup
+  document.getElementById('closeAiPopup').addEventListener('click', ()=>{
+    document.getElementById('aiResultPopup').classList.add('hidden');
+  });
+
+  // Attach analyze button
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  if(analyzeBtn){
+    analyzeBtn.addEventListener('click', analyzeCorruptionDetails);
+  }
+
+  // Attach location blur
+  // removed old locationText reference (no textarea now);
+  if(locationText){
+    locationText.addEventListener('blur', analyzeLocationWithAI);
+  }
 });
 
-// แทรก popup เข้า logic วิเคราะห์ AI เดิม
-const originalAnalyze = analyzeCorruptionDetails;
-analyzeCorruptionDetails = async function(){
-  await originalAnalyze();
-  if(aiChecked){
-    const village = document.getElementById('villageField').value;
-    const subdistrict = document.getElementById('subdistrictField').value;
-    const district = document.getElementById('districtField').value;
-    const province = document.getElementById('provinceField').value;
+</script>
+
+<script>
+// -------------------------
+// AI analyze flow (frontend -> Supabase Edge Function)
+// -------------------------
+let aiChecked = false;
+let aiIsNACC = false;
+
+async function analyzeCorruptionDetails(){
+  const inputEl = document.getElementById('user-input');
+  const outputBox = document.getElementById('chat-output');
+  const reportBtn = document.getElementById('reportCorruptionBtn');
+
+  if(!inputEl || !outputBox || !reportBtn) return;
+
+  const input = inputEl.value.trim();
+  aiChecked = false; aiIsNACC = false;
+  reportBtn.disabled = true; reportBtn.classList.add('opacity-50');
+
+  if(!input) {
+    showToast('กรุณากรอกรายละเอียดก่อนวิเคราะห์');
+    return;
+  }
+
+  // Show user message in chat
+  const userMsg = document.createElement('div');
+  userMsg.className = 'p-2 bg-gray-200 rounded-xl self-end';
+  userMsg.textContent = input;
+  outputBox.appendChild(userMsg);
+  outputBox.scrollTop = outputBox.scrollHeight;
+
+  try{
+    const res = await fetch('https://ylbklwrgbgmlrvknmmbn.supabase.co/functions/v1/analyze-nacc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        text: input,
+        village: document.getElementById('villageField').value || "",
+        subdistrict: document.getElementById('subdistrictField').value || "",
+        district: document.getElementById('districtField').value || "",
+        province: document.getElementById('provinceField').value || ""
+      })
+    });
+
+    if(!res.ok){
+      const txt = await res.text();
+      const errMsg = `การวิเคราะห์ล้มเหลว: ${res.status} ${txt}`;
+      const botErr = document.createElement('div'); botErr.className='p-2 rounded-xl bg-red-200'; botErr.textContent = errMsg; outputBox.appendChild(botErr);
+      showToast('เกิดข้อผิดพลาดในการเรียก API');
+      return;
+    }
+
+    const ai = await res.json();
+
+    // Expect ai to be an object like { is_nacc_responsibility: true, message: '...' }
+    aiChecked = true;
+    aiIsNACC = ai.is_nacc_responsibility === true;
+
+    const botMsg = document.createElement('div');
+    botMsg.className = 'p-2 rounded-xl';
+    botMsg.textContent = ai.reason || ai.reason || ai.message || JSON.stringify(ai);
+    botMsg.classList.add(aiIsNACC ? 'bg-green-200' : 'bg-red-200');
+    outputBox.appendChild(botMsg);
+    outputBox.scrollTop = outputBox.scrollHeight;
+
+    // Enable report button only if AI says it's NACC responsibility
+    if(aiIsNACC){ 
+      reportBtn.disabled = false; 
+      reportBtn.classList.remove('opacity-50');
+      reportBtn.classList.remove('hidden');
+    } reportBtn.classList.remove('opacity-50'); }
+
+    // Show popup with detected location fields (if any)
+    const village = document.getElementById('villageField').value || '-';
+    const subdistrict = document.getElementById('subdistrictField').value || '-';
+    const district = document.getElementById('districtField').value || '-';
+    const province = document.getElementById('provinceField').value || '-';
+
+    const userLocation = `${document.getElementById('villageInput').value || ''} ${document.getElementById('subdistrictInput').value || ''} ${document.getElementById('districtInput').value || ''} ${document.getElementById('provinceInput').value || ''}`.trim();
 
     const locationText = aiIsNACC
       ? `<span class='text-green-700 font-bold text-lg'>✔ เป็นความรับผิดชอบของสำนักงาน ป.ป.ช</span><br>
          <span class='text-gray-800'>พื้นที่ตรวจสอบ:</span><br>
-         <span class='text-gray-700'>หมู่บ้าน: <b>${village || '-'}</b></span><br>
-         <span class='text-gray-700'>ตำบล: <b>${subdistrict || '-'}</b></span><br>
-         <span class='text-gray-700'>อำเภอ: <b>${district || '-'}</b></span><br>
-         <span class='text-gray-700'>จังหวัด: <b>${province || '-'}</b></span>`
-      : `<span class='text-red-700 font-bold text-lg'>✖ ไม่อยู่ในความรับผิดชอบของสำนักงาน ป.ป.ช</span>`;
+         <span class='text-gray-700'>สถานที่ทุจริตที่ระบุ: <b>${userLocation}</b></span><br>
+         <span class='text-gray-700'>หมู่บ้าน: <b>${village}</b></span><br>
+         <span class='text-gray-700'>ตำบล: <b>${subdistrict}</b></span><br>
+         <span class='text-gray-700'>อำเภอ: <b>${district}</b></span><br>
+         <span class='text-gray-700'>จังหวัด: <b>${province}</b></span>`
+      : `<span class='text-red-700 font-bold text-lg'>✖ ไม่อยู่ในความรับผิดชอบของสำนักงาน ป.ป.ช</span><br>
+         <span class='text-gray-700'>สถานที่ทุจริตที่ระบุ: <b>${userLocation}</b></span>`;
+
     showAiPopup(locationText);
+
+  }catch(err){
+    const botErr = document.createElement('div'); botErr.className='p-2 rounded-xl bg-red-200'; botErr.textContent = `Error: ${err.message}`; outputBox.appendChild(botErr);
+    showToast('เกิดข้อผิดพลาดในการวิเคราะห์');
   }
-};
+}
+
+// -------------------------
+// Location extraction (frontend -> Supabase extract-location function)
+// -------------------------
+async function analyzeLocationWithAI(){
+  const text = document.getElementById('locationText')?.value?.trim();
+  if(!text) return;
+
+  try{
+    const res = await fetch('https://ylbklwrgbgmlrvknmmbn.supabase.co/functions/v1/extract-location', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+
+    if(!res.ok) return;
+    const data = await res.json();
+
+    document.getElementById('provinceField').value = data.province || '';
+    document.getElementById('districtField').value = data.district || '';
+    document.getElementById('subdistrictField').value = data.subdistrict || '';
+    document.getElementById('villageField').value = data.village || '';
+  }catch(err){
+    console.warn('extract-location failed', err);
+  }
+}
+
 </script>
 
 </body>
